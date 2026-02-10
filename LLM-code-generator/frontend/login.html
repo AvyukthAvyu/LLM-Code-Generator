@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+        .container {
+            width: 360px;
+            margin: auto;
+            padding: 25px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.15);
+            border-radius: 8px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: 15px;
+        }
+        button {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .error {
+            color: red;
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+        .home-link {
+            display: inline-block;
+            margin-bottom: 10px;
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a class="home-link" href="/frontend/index.html">Home</a>
+        <h2>Login</h2>
+
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Enter email">
+
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter password">
+
+        <button onclick="login()">Login</button>
+        <button class="btn-secondary" onclick="window.location.href='/frontend/register.html'">Create Account</button>
+
+        <div class="error" id="errorBox">Invalid username or password</div>
+    </div>
+
+<script>
+    async function login() {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const errorBox = document.getElementById("errorBox");
+
+        errorBox.style.display = "none";
+
+        if (!email || !password) {
+            errorBox.textContent = "Please enter both fields.";
+            errorBox.style.display = "block";
+            return;
+        }
+
+        try {
+            const response = await fetch("/auth/token", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+                errorBox.textContent = "Incorrect username or password.";
+                errorBox.style.display = "block";
+                return;
+            }
+
+            const data = await response.json();
+
+            // Save token for API calls
+            localStorage.setItem("token", data.access_token);
+            localStorage.setItem("username", email);
+            localStorage.setItem("role", data.role || "user");
+
+            // Redirect based on role
+            if (data.role === "admin") {
+                window.location.href = "/frontend/admin.html";
+            } else {
+                window.location.href = "/frontend/chat.html";
+            }
+
+        } catch (err) {
+            errorBox.textContent = "Server error. Try again later.";
+            errorBox.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

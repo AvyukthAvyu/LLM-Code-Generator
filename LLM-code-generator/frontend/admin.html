@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f3f7ff 0%, #eef2f3 100%);
+            padding: 32px;
+            color: #0f172a;
+        }
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            padding: 20px;
+        }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .topbar a {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .badge {
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-danger {
+            background: #e11d48;
+            color: white;
+        }
+        .btn-danger:hover { background: #be123c; }
+        .btn-ghost {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .stat h3 {
+            margin: 0;
+            font-size: 26px;
+        }
+        .stat p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+        table {
+            width: 100%;
+            margin-top: 12px;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 14px;
+        }
+        th {
+            background: #f9fafb;
+            color: #374151;
+            font-weight: 600;
+        }
+        .section {
+            margin-top: 18px;
+        }
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal {
+            background: white;
+            width: 900px;
+            max-width: 95%;
+            border-radius: 14px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            padding: 20px;
+        }
+        .modal h4 {
+            margin: 0 0 8px 0;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .detail-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+        .chat-list {
+            max-height: 420px;
+            overflow: auto;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            padding: 12px;
+            background: #f9fafb;
+            margin-top: 12px;
+        }
+        .chat-item {
+            background: white;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+        }
+        .chat-item .label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        .chat-item .content {
+            margin-top: 4px;
+            font-size: 14px;
+            color: #111827;
+            white-space: pre-wrap;
+        }
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .detail-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="topbar">
+        <a href="/frontend/index.html">Home</a>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <span class="badge">Admin</span>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 style="margin:0 0 8px 0;">Admin Dashboard</h2>
+        <div style="color:#64748b;font-size:14px;">
+            Logged in as <strong id="adminUser"></strong>
+        </div>
+    </div>
+
+    <div class="section grid">
+        <div class="card stat">
+            <div>
+                <p>Total Users</p>
+                <h3 id="totalUsers">0</h3>
+            </div>
+            <span class="badge">Users</span>
+        </div>
+        <div class="card stat">
+            <div>
+                <p>Admin Accounts</p>
+                <h3 id="totalAdmins">0</h3>
+            </div>
+            <span class="badge">Admins</span>
+        </div>
+        <div class="card stat">
+            <div>
+                <p>Last Refresh</p>
+                <h3 id="lastRefresh">—</h3>
+            </div>
+            <span class="badge">Live</span>
+        </div>
+    </div>
+
+    <div class="section card">
+        <h3 style="margin-top:0;">Users</h3>
+        <table id="userTable">
+            <thead>
+            <tr>
+                <th>Email / Username</th>
+                <th>Registered On</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="userModal">
+    <div class="modal">
+        <div class="topbar" style="margin-bottom:8px;">
+            <h4 id="userModalTitle">User Details</h4>
+            <button class="btn btn-ghost" onclick="closeUserModal()">Back to Dashboard</button>
+        </div>
+        <div class="detail-grid" id="userDetails"></div>
+        <div class="chat-list" id="userChats"></div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (!token || role !== "admin") {
+        window.location.href = "/frontend/login.html";
+    }
+
+    document.getElementById("adminUser").textContent =
+        localStorage.getItem("username") || "admin";
+
+    let allUsers = [];
+    let allChats = [];
+
+    async function loadUsers() {
+        const res = await fetch("/admin/users", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        allUsers = await res.json();
+
+        document.getElementById("totalUsers").textContent = allUsers.length;
+        const adminCount = allUsers.filter(u => u.is_admin).length;
+        document.getElementById("totalAdmins").textContent = adminCount;
+        document.getElementById("lastRefresh").textContent = new Date().toLocaleTimeString();
+
+        const tbody = document.querySelector("#userTable tbody");
+        tbody.innerHTML = "";
+
+        allUsers.forEach(u => {
+            const userEmail = u.email || u.username || "Unknown";
+            const row = `<tr>
+                <td>${userEmail}</td>
+                <td>${u.created_at || ""}</td>
+                <td>
+                    <button class="btn btn-primary" onclick="openUserModal('${userEmail.replace(/'/g, "\\'")}')">View Details</button>
+                </td>
+            </tr>`;
+            tbody.insertAdjacentHTML("beforeend", row);
+        });
+    }
+
+    async function loadChats() {
+        const res = await fetch("/admin/chats", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        allChats = await res.json();
+    }
+
+    function openUserModal(email) {
+        const modal = document.getElementById("userModal");
+        const detail = document.getElementById("userDetails");
+        const chats = document.getElementById("userChats");
+        const user = allUsers.find(u => (u.email || u.username) === email) || {};
+
+        document.getElementById("userModalTitle").textContent = `User Details: ${email}`;
+        detail.innerHTML = `
+            <div class="detail-item"><strong>Email:</strong> ${user.email || email}</div>
+            <div class="detail-item"><strong>Registered:</strong> ${user.created_at || "—"}</div>
+            <div class="detail-item"><strong>Role:</strong> ${user.is_admin ? "Admin" : "User"}</div>
+            <div class="detail-item"><strong>Chats:</strong> ${allChats.filter(c => c.username === email).length}</div>
+        `;
+
+        const userChats = allChats.filter(c => c.username === email);
+        if (userChats.length === 0) {
+            chats.innerHTML = `<div class="chat-item"><div class="content">No chats yet.</div></div>`;
+        } else {
+            chats.innerHTML = "";
+            userChats.forEach(c => {
+                chats.innerHTML += `
+                    <div class="chat-item">
+                        <div class="label">Prompt</div>
+                        <div class="content">${c.prompt || ""}</div>
+                        <div class="label" style="margin-top:8px;">Response</div>
+                        <div class="content">${c.response || ""}</div>
+                    </div>
+                `;
+            });
+        }
+
+        modal.style.display = "flex";
+    }
+
+    function closeUserModal() {
+        document.getElementById("userModal").style.display = "none";
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = "/frontend/login.html";
+    }
+
+    loadUsers();
+    loadChats();
+</script>
+</body>
+</html>
